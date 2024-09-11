@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Builder Mejorado - Crea tu Currículum Vitae Profesional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">CV Builder Mejorado - Crea tu Currículum Vitae Profesional</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="template-card" data-template="modern">
+                <h3 class="font-bold mb-2">Moderno</h3>
+                <div class="bg-blue-500 h-32 rounded-lg flex items-center justify-center text-white">Diseño Moderno</div>
+            </div>
+            <div class="template-card" data-template="classic">
+                <h3 class="font-bold mb-2">Clásico</h3>
+                <div class="bg-gray-700 h-32 rounded-lg flex items-center justify-center text-white">Diseño Clásico</div>
+            </div>
+            <div class="template-card" data-template="creative">
+                <h3 class="font-bold mb-2">Creativo</h3>
+                <div class="bg-green-500 h-32 rounded-lg flex items-center justify-center text-white">Diseño Creativo</div>
+            </div>
+            <div class="template-card" data-template="minimalist">
+                <h3 class="font-bold mb-2">Minimalista</h3>
+                <div class="bg-gray-300 h-32 rounded-lg flex items-center justify-center text-gray-800">Diseño Minimalista</div>
+            </div>
+        </div>
+
+        <form id="cv-form" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
+                    Nombre completo:
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" name="name" type="text" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                    Correo electrónico:
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" name="email" type="email" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">
+                    Teléfono:
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="phone" name="phone" type="tel">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="summary">
+                    Resumen profesional:
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="summary" name="summary" rows="4"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="experience">
+                    Experiencia laboral:
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="experience" name="experience" rows="6"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="education">
+                    Educación:
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="education" name="education" rows="4"></textarea>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="skills">
+                    Habilidades:
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="skills" name="skills" rows="4"></textarea>
+            </div>
+            <div class="flex items-center justify-between">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Generar y Descargar CV
+                </button>
+            </div>
+        </form>
+
+        <div id="preview" class="bg-white shadow-md rounded p-8 mb-4 hidden"></div>
+    </div>
+
+    <script>
+    const templates = {
+        modern: `
+            <div class="font-sans max-w-4xl mx-auto bg-gray-100">
+                <div class="bg-blue-600 text-white p-8">
+                    <h1 class="text-3xl font-bold mb-2">{name}</h1>
+                    <p class="mb-1">{email}</p>
+                    <p>{phone}</p>
+                    <div class="mt-6">
+                        <h2 class="text-xl font-semibold mb-2">Habilidades</h2>
+                        <p>{skills}</p>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <section class="mb-6">
+                        <h2 class="text-2xl font-bold text-blue-800 border-b-2 border-blue-600 pb-2 mb-3">Resumen Profesional</h2>
+                        <p>{summary}</p>
+                    </section>
+                    <section class="mb-6">
+                        <h2 class="text-2xl font-bold text-blue-800 border-b-2 border-blue-600 pb-2 mb-3">Experiencia Laboral</h2>
+                        <p>{experience}</p>
+                    </section>
+                    <section>
+                        <h2 class="text-2xl font-bold text-blue-800 border-b-2 border-blue-600 pb-2 mb-3">Educación</h2>
+                        <p>{education}</p>
+                    </section>
+                </div>
+            </div>
+        `,
+        classic: `
+            <div class="font-serif max-w-4xl mx-auto bg-white p-8">
+                <header class="text-center border-b-2 border-gray-800 pb-4 mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">{name}</h1>
+                    <p class="mb-1">{email}</p>
+                    <p>{phone}</p>
+                </header>
+                <section class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b border-gray-400 pb-2 mb-3">Resumen Profesional</h2>
+                    <p>{summary}</p>
+                </section>
+                <section class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b border-gray-400 pb-2 mb-3">Experiencia Laboral</h2>
+                    <p>{experience}</p>
+                </section>
+                <section class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b border-gray-400 pb-2 mb-3">Educación</h2>
+                    <p>{education}</p>
+                </section>
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-800 border-b border-gray-400 pb-2 mb-3">Habilidades</h2>
+                    <p>{skills}</p>
+                </section>
+            </div>
+        `,
+        creative: `
+            <div class="font-sans max-w-4xl mx-auto bg-green-500 text-white p-8">
+                <header class="mb-8">
+                    <h1 class="text-4xl font-bold mb-4">{name}</h1>
+                    <div>
+                        <p class="mb-1">{email}</p>
+                        <p>{phone}</p>
+                    </div>
+                </header>
+                <section class="bg-white bg-opacity-20 p-6 rounded-lg mb-6">
+                    <h2 class="text-2xl font-bold text-yellow-300 mb-3">Resumen Profesional</h2>
+                    <p>{summary}</p>
+                </section>
+                <section class="bg-white bg-opacity-20 p-6 rounded-lg mb-6">
+                    <h2 class="text-2xl font-bold text-yellow-300 mb-3">Experiencia Laboral</h2>
+                    <p>{experience}</p>
+                </section>
+                <section class="bg-white bg-opacity-20 p-6 rounded-lg mb-6">
+                    <h2 class="text-2xl font-bold text-yellow-300 mb-3">Educación</h2>
+                    <p>{education}</p>
+                </section>
+                <section class="bg-white bg-opacity-20 p-6 rounded-lg">
+                    <h2 class="text-2xl font-bold text-yellow-300 mb-3">Habilidades</h2>
+                    <p>{skills}</p>
+                </section>
+            </div>
+        `,
+        minimalist: `
+            <div class="font-sans max-w-4xl mx-auto bg-white p-8">
+                <h1 class="text-4xl font-light text-gray-800 mb-4">{name}</h1>
+                <p class="text-gray-600 mb-1">{email}</p>
+                <p class="text-gray-600 mb-8">{phone}</p>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-light text-gray-800 mb-3">Resumen Profesional</h2>
+                    <p class="text-gray-700">{summary}</p>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-light text-gray-800 mb-3">Experiencia Laboral</h2>
+                    <p class="text-gray-700">{experience}</p>
+                </section>
+                <section class="mb-8">
+                    <h2 class="text-2xl font-light text-gray-800 mb-3">Educación</h2>
+                    <p class="text-gray-700">{education}</p>
+                </section>
+                <section>
+                    <h2 class="text-2xl font-light text-gray-800 mb-3">Habilidades</h2>
+                    <p class="text-gray-700">{skills}</p>
+                </section>
+            </div>
+        `
+    };
+
+    let selectedTemplate = 'modern';
+
+    document.querySelectorAll('.template-card').forEach(template => {
+        template.addEventListener('click', () => {
+            document.querySelectorAll('.template-card').forEach(t => t.classList.remove('ring-2', 'ring-blue-500'));
+            template.classList.add('ring-2', 'ring-blue-500');
+            selectedTemplate = template.dataset.template;
+        });
+    });
+
+    document.getElementById('cv-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        let cvContent = templates[selectedTemplate];
+        for (let [key, value] of formData.entries()) {
+            cvContent = cvContent.replace(`{${key}}`, value);
+        }
+        
+        const previewDiv = document.getElementById('preview');
+        previewDiv.innerHTML = cvContent;
+        previewDiv.classList.remove('hidden');
+        previewDiv.scrollIntoView({ behavior: 'smooth' });
+
+        html2canvas(previewDiv, {
+            scale: 2,
+            useCORS: true,
+            logging: false
+        }).then(canvas => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210;
+            const pageHeight = 297;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            pdf.save('cv.pdf');
+        });
+    });
+    </script>
+</body>
+</html>
